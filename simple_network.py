@@ -1,14 +1,17 @@
-sdasdasd
-
 from abc import ABC, abstractmethod
 import time
+import re
 
 # implement deleting a machine and removing the ip address from the pool
 # invalid ip address based on a regex pattern
-sadsadas
+
 class MachineNotRunningException(Exception):
 	def __init__(self, server) -> None:
 		super().__init__(f"{server.ip_address} is not in Running state")
+
+class WrongIPAddressFormat(Exception):
+	def __init__(self, ip_address) -> None:
+		super().__init__(f"{ip_address} is not in the correct format. Should be like: '127.0.0.1'")
 
 class DuplicateIPAddressException(Exception):
 	def __init__(self, ip_address) -> None:
@@ -24,6 +27,17 @@ class Machine(ABC):
 	def __init__(self, ip_address, port, outgoing_capacity, incoming_capacity):
 		# if not isinstance(id, int):
 		# 	raise ValueError("id must be an integer")
+		ip_address_pattern = r"^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+		if not re.match(ip_address_pattern, ip_address):
+			raise WrongIPAddressFormat(ip_address)
+
+		# Test the pattern
+		ip_address = "192.168.1.1"
+		if re.match(ip_address_pattern, ip_address):
+			print(f"{ip_address} is a valid IP address.")
+		else:
+			print(f"{ip_address} is not a valid IP address.")
+
 		if ip_address in self.__class__.used_ip_addresses:
 			raise DuplicateIPAddressException(ip_address)
 		else:
@@ -137,10 +151,3 @@ client2 = Client("125.0.0.1", 54432, 10, 10)
 client2.start()
 
 client1.send_request("127.0.0.1", "Hello World")
-
-
-asdnasjdn
-kasmdlkams
-
-
-askdmaskmd
