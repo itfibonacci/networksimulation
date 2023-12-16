@@ -35,7 +35,8 @@ class Machine(ABC):
 		self.outgoing_requests = 0
 		self.status = "Stopped"
 	
-	def find_server_by_ip(self, ip_address):
+	@classmethod
+	def find_machine_by_ip(cls, ip_address):
 		if ip_address in Server.all_servers:
 			return Server.all_servers[ip_address]
 		elif ip_address in Client.all_clients:
@@ -62,9 +63,25 @@ class Server(Machine, ABC):
 		self.incoming_capacity -= 1
 		# Simulate processing the request
 		time.sleep(0.1)
+		print(f"Received request: {message.message_content} from client: {message.get_origin_address()}")
+		self.incoming_requests -= 1
+		self.incoming_capacity += 1
+		# Send the response back to the client
+		response_content = "Response to the message: {message.message_content}"
+		response = Message(origin_address = self.ip_address, destination_address = message.origin_address, message_content = response_content)
+		self.send_response(response)
 
-	def send_response(self, destination_address):
-		bulk_response = Message( self.ip_address, destination_address )
+	def send_response(self, message):
+		# Send the response back to the client
+		self.outgoing_requests += 1
+		self.outgoing_capacity -= 1
+		time.sleep(0.1)
+		client = Machine.find_machine_by_ip(message.get_destination_address())
+		# todo
+		print(f"Sent response: {message.message_content} to client: {message.get_destination_address()}")
+		self.outgoing_requests -= 1
+		self.outgoing_capacity += 1
+		client.receive_response(message)
 
 class ApplicationServer(Server):
 	def __init__(self, ip_address, port, outgoing_capacity, incoming_capacity):
@@ -75,6 +92,12 @@ class Message():
 		self.origin_address = origin_address
 		self.destination_address = destination_address
 		self.message_content = message_content
+	
+	def get_origin_address(self):
+		return self.origin_address
+	
+	def get_destination_address(self):
+		return self.destination_address
 
 class Client(Machine):
 	all_clients = {}
@@ -83,26 +106,33 @@ class Client(Machine):
 		super().__init__(ip_address, port, outgoing_capacity, incoming_capacity)
 		self.__class__.all_clients[ip_address] = self
 
-	def send_request(self, destination_address, message_content ):
-		server = self.find_server_by_ip(destination_address)
+	def send_request(self, destination_address, message_content):
+		self.outgoing_requests += 1
+		self.outgoing_capacity -= 1
+		server_to_send = self.find_machine_by_ip(destination_address)
 		message = Message(origin_address = self.ip_address, destination_address = destination_address, message_content = message_content)
-		server.handle_request(message = message)
+		self.outgoing_requests -= 1
+		self.outgoing_capacity += 1
+		print(f"Sent request: {message.message_content} to server: {message.get_destination_address()}")
+		server_to_send.handle_request(message = message)
+		
 
-	def receive_response(self):
-		pass
+	def receive_response(self, message):
+		self.incoming_requests += 1
+		self.incoming_capacity -= 1
+		time.sleep(0.1)
+		print(f"Received response: {message.message_content} from server: {message.get_origin_address()}")
+		self.incoming_requests -= 1
+		self.incoming_capacity += 1
 
-ap1 = ApplicationServer("127.0.0.1", 65543, 1000, 10000)
+ap1 = ApplicationServer("127.0.0.1", 65543, 100, 100)
 ap1.start()
 ap2 = ApplicationServer("128.0.0.1", 65543, 1000, 10000)
 ap2.start()
-
-print(Server.all_servers)
 
 client1 = Client("124.0.0.1", 54432, 10, 10)
 client1.start()
 client2 = Client("125.0.0.1", 54432, 10, 10)
 client2.start()
 
-#client1.send_request( destination_address, "message")
-
-# client to have an ability to send a message, and the server respond to that message
+client1.send_request("127.0.0.1", "Hello World")
