@@ -1,9 +1,11 @@
+sdasdasd
+
 from abc import ABC, abstractmethod
 import time
 
 # implement deleting a machine and removing the ip address from the pool
 # invalid ip address based on a regex pattern
-
+sadsadas
 class MachineNotRunningException(Exception):
 	def __init__(self, server) -> None:
 		super().__init__(f"{server.ip_address} is not in Running state")
@@ -115,7 +117,6 @@ class Client(Machine):
 		self.outgoing_capacity += 1
 		print(f"Sent request: {message.message_content} to server: {message.get_destination_address()}")
 		server_to_send.handle_request(message = message)
-		
 
 	def receive_response(self, message):
 		self.incoming_requests += 1
@@ -136,3 +137,10 @@ client2 = Client("125.0.0.1", 54432, 10, 10)
 client2.start()
 
 client1.send_request("127.0.0.1", "Hello World")
+
+
+asdnasjdn
+kasmdlkams
+
+
+askdmaskmd
