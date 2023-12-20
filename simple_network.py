@@ -96,7 +96,7 @@ class Machine(ABC):
 
 	def start(self):
 		self.status = "Running"
-		logging.info(f"{self.__class__.__name__} with ip: {self.ip_address} has been started.")
+		logging.info(f"[{self.ip_address}]:{self.__class__.__name__} started")
 
 class Server(Machine, ABC):
 	all_servers = {}
@@ -113,7 +113,7 @@ class Server(Machine, ABC):
 		self.incoming_capacity -= 1
 		# Simulate processing the request
 		time.sleep(0.1)
-		logging.info(f"Received request: {message.message_content} from client: {message.get_origin_address()}")
+		logging.info(f"[{self.ip_address}]:Received request: {message.message_content} from client: {message.get_origin_address()}")
 		self.incoming_requests -= 1
 		self.incoming_capacity += 1
 		# Send the response back to the client
@@ -131,7 +131,7 @@ class Server(Machine, ABC):
 		time.sleep(0.1)
 		client = Machine.find_machine_by_ip(message.get_destination_address())
 		# todo
-		logging.info(f"Sent response: {message.message_content} to client: {message.get_destination_address()}")
+		logging.info(f"[{self.ip_address}]:Sent response: {message.message_content} to client: {message.get_destination_address()}")
 		self.outgoing_requests -= 1
 		self.outgoing_capacity += 1
 		client.receive_response(message)
@@ -154,14 +154,14 @@ class Client(Machine):
 		message = Message(origin_address = self.ip_address, destination_address = destination_address, message_content = message_content)
 		self.outgoing_requests -= 1
 		self.outgoing_capacity += 1
-		logging.info(f"Sent request: {message.message_content}, from {self.ip_address} to server: {message.get_destination_address()}")
+		logging.info(f"[{self.ip_address}]:Sent request: {message.message_content} to server: {message.get_destination_address()}")
 		server_to_send.handle_request(message = message)
 
 	def receive_response(self, message):
 		self.incoming_requests += 1
 		self.incoming_capacity -= 1
 		time.sleep(0.1)
-		logging.info(f"Received response: {message.message_content} from server: {message.get_origin_address()}")
+		logging.info(f"[{self.ip_address}]:Received response: {message.message_content} from server: {message.get_origin_address()}")
 		self.incoming_requests -= 1
 		self.incoming_capacity += 1
 
