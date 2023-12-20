@@ -32,7 +32,6 @@ class Machine(ABC):
 			raise WrongIPAddressFormat(ip_address)
 
 		# Test the pattern
-		ip_address = "192.168.1.1"
 		if re.match(ip_address_pattern, ip_address):
 			print(f"{ip_address} is a valid IP address.")
 		else:
@@ -148,6 +147,8 @@ ap2.start()
 client1 = Client("124.0.0.1", 54432, 10, 10)
 client1.start()
 client2 = Client("125.0.0.1", 54432, 10, 10)
+client2.start()
+client3 = Client("126.0.0.1", 54432, 10, 10)
 client2.start()
 
 client1.send_request("127.0.0.1", "Hello World")
