@@ -1,9 +1,33 @@
 from abc import ABC, abstractmethod
 import time
 import re
+import logging
+from datetime import datetime
+from os import path, makedirs
 
 # implement deleting a machine and removing the ip address from the pool
 # invalid ip address based on a regex pattern
+
+# Logging setup to log to a file
+def get_log_filename():
+	dir_name = "logs"
+	# Check if the directory exists
+	if not path.exists(dir_name):
+		# If the directory doesn't exist, create it
+		makedirs(dir_name)
+
+	# Get current date and time
+	now = datetime.now()
+
+	# Format as a string
+	date_time_str = now.strftime("%Y%m%d_%H%M%S")
+
+	# Attach to a filename
+	filename = f"{dir_name}/server_logs_{date_time_str}.txt"
+
+	return filename
+
+logging.basicConfig(filename=get_log_filename(), encoding='utf-8', format='%(asctime)s:%(levelname)s:%(message)s', level=logging.DEBUG)
 
 class MachineNotRunningException(Exception):
 	def __init__(self, server) -> None:
@@ -72,7 +96,7 @@ class Machine(ABC):
 
 	def start(self):
 		self.status = "Running"
-		print(f"{self.__class__.__name__} with ip: {self.ip_address} has been started.")
+		logging.info(f"{self.__class__.__name__} with ip: {self.ip_address} has been started.")
 
 class Server(Machine, ABC):
 	all_servers = {}
@@ -89,7 +113,7 @@ class Server(Machine, ABC):
 		self.incoming_capacity -= 1
 		# Simulate processing the request
 		time.sleep(0.1)
-		print(f"Received request: {message.message_content} from client: {message.get_origin_address()}")
+		logging.info(f"Received request: {message.message_content} from client: {message.get_origin_address()}")
 		self.incoming_requests -= 1
 		self.incoming_capacity += 1
 		# Send the response back to the client
@@ -107,7 +131,7 @@ class Server(Machine, ABC):
 		time.sleep(0.1)
 		client = Machine.find_machine_by_ip(message.get_destination_address())
 		# todo
-		print(f"Sent response: {message.message_content} to client: {message.get_destination_address()}")
+		logging.info(f"Sent response: {message.message_content} to client: {message.get_destination_address()}")
 		self.outgoing_requests -= 1
 		self.outgoing_capacity += 1
 		client.receive_response(message)
@@ -130,14 +154,14 @@ class Client(Machine):
 		message = Message(origin_address = self.ip_address, destination_address = destination_address, message_content = message_content)
 		self.outgoing_requests -= 1
 		self.outgoing_capacity += 1
-		print(f"Sent request: {message.message_content} to server: {message.get_destination_address()}")
+		logging.info(f"Sent request: {message.message_content}, from {self.ip_address} to server: {message.get_destination_address()}")
 		server_to_send.handle_request(message = message)
 
 	def receive_response(self, message):
 		self.incoming_requests += 1
 		self.incoming_capacity -= 1
 		time.sleep(0.1)
-		print(f"Received response: {message.message_content} from server: {message.get_origin_address()}")
+		logging.info(f"Received response: {message.message_content} from server: {message.get_origin_address()}")
 		self.incoming_requests -= 1
 		self.incoming_capacity += 1
 
