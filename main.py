@@ -42,8 +42,9 @@ def main():
     client2.start()
     client3 = Client("126.0.0.1", 54432, 10, 10)
     client3.start()
-    #client1.send_request_continuously("127.0.0.1", "Hello World")
     client1.send_request_bulk("127.0.0.1", "Hello World", 1000)
+    client2.send_request_bulk("128.0.0.1", "Hello World", 1000)
+    client3.send_request_bulk("127.0.0.1", "Hello World", 1000)
 
 if __name__ == "__main__":
     main()
