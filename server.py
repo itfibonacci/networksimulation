@@ -4,7 +4,7 @@ import time
 
 from message import Message
 from machine import Machine
-from exceptions import MachineNotRunningException
+from exceptions import MachineNotRunningException, IPAddressNotFoundException
 
 class Server(Machine, ABC):
 	all_servers = {}
@@ -12,7 +12,7 @@ class Server(Machine, ABC):
 	def __init__(self, ip_address, port, outgoing_capacity, incoming_capacity):
 		super().__init__(ip_address, port, outgoing_capacity, incoming_capacity)
 		self.__class__.all_servers[ip_address] = self
-
+		
 	def handle_request(self, message):
 		if (self.status != "Running"):
 			raise MachineNotRunningException(self)
