@@ -21,7 +21,7 @@ class Server(Machine, ABC):
 		self.incoming_capacity -= 1
 		# Simulate processing the request
 		time.sleep(0.1)
-		logging.info(f"[{self.ip_address}]:Received request: {message.message_content} from client: {message.get_origin_address()}")
+		logging.info(f"[{self.ip_address}]:Received request: {message.id} from client: {message.get_origin_address()}")
 		self.incoming_requests -= 1
 		self.incoming_capacity += 1
 		# Send the response back to the client
@@ -39,7 +39,7 @@ class Server(Machine, ABC):
 		time.sleep(0.1)
 		client = Machine.find_machine_by_ip(message.get_destination_address())
 		# todo
-		logging.info(f"[{self.ip_address}]:Sent response: {message.message_content} to client: {message.get_destination_address()}")
+		logging.info(f"[{self.ip_address}]:Sent response: {message.id} to client: {message.get_destination_address()}")
 		self.outgoing_requests -= 1
 		self.outgoing_capacity += 1
 		client.receive_response(message)
@@ -47,3 +47,15 @@ class Server(Machine, ABC):
 class ApplicationServer(Server):
 	def __init__(self, ip_address, port, outgoing_capacity, incoming_capacity):
 		super().__init__(ip_address, port, outgoing_capacity, incoming_capacity)
+
+class DatabaseServer(Server):
+	def __init__(self, id, ip_address, port, outgoing_capacity, incoming_capacity):
+		super().__init__(id, port, ip_address, outgoing_capacity, incoming_capacity)
+		self.databases = []
+
+	def create_database(self, database_name):
+		self.database_name = self.databases.append(database_name)
+
+class WebServer(Server):
+	def __init__(self):
+		pass
