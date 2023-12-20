@@ -4,7 +4,7 @@ from exceptions import WrongIPAddressFormat, DuplicateIPAddressException, IPAddr
 import re
 
 class Machine(ABC):
-	
+
 	used_ip_addresses = set()
 	all_machines = {}
 
@@ -49,5 +49,8 @@ class Machine(ABC):
 			return True
 
 	def start(self):
-		self.status = "Running"
-		logging.info(f"[{self.ip_address}]:{self.__class__.__name__} started")
+		if self.status == "Stopped":
+			self.status = "Running"
+			logging.info(f"[{self.ip_address}]:{self.__class__.__name__} started")
+		elif self.status == "Running":
+			logging.warn(f"[{self.ip_address}]:{self.__class__.__name__} has been started already.")
