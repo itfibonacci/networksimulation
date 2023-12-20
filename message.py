@@ -1,5 +1,8 @@
+from uuid import uuid4
+
 class Message():
 	def __init__(self, origin_address, destination_address, message_content ) -> None:
+		self.id = uuid4()
 		self.origin_address = origin_address
 		self.destination_address = destination_address
 		self.message_content = message_content
