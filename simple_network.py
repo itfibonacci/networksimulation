@@ -21,21 +21,25 @@ class IPAddressNotFoundException(Exception):
 	def __init__(self, ip_address) -> None:
 		super().__init__(f"{ip_address} is not registered to any server.")
 
+class Message():
+	def __init__(self, origin_address, destination_address, message_content ) -> None:
+		self.origin_address = origin_address
+		self.destination_address = destination_address
+		self.message_content = message_content
+	
+	def get_origin_address(self):
+		return self.origin_address
+	
+	def get_destination_address(self):
+		return self.destination_address
+
 class Machine(ABC):
 	used_ip_addresses = set()
 
 	def __init__(self, ip_address, port, outgoing_capacity, incoming_capacity):
-		# if not isinstance(id, int):
-		# 	raise ValueError("id must be an integer")
-		ip_address_pattern = r"^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
-		if not re.match(ip_address_pattern, ip_address):
+		
+		if not self.check_ip_address_format(ip_address):
 			raise WrongIPAddressFormat(ip_address)
-
-		# Test the pattern
-		if re.match(ip_address_pattern, ip_address):
-			print(f"{ip_address} is a valid IP address.")
-		else:
-			print(f"{ip_address} is not a valid IP address.")
 
 		if ip_address in self.__class__.used_ip_addresses:
 			raise DuplicateIPAddressException(ip_address)
@@ -58,6 +62,13 @@ class Machine(ABC):
 			return Client.all_clients[ip_address]
 		else:
 			raise IPAddressNotFoundException(ip_address)
+	
+	def check_ip_address_format(self, ip_address):
+		ip_address_pattern = r"^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+		if not re.match(ip_address_pattern, ip_address):
+			return False
+		else:
+			return True
 
 	def start(self):
 		self.status = "Running"
@@ -82,8 +93,11 @@ class Server(Machine, ABC):
 		self.incoming_requests -= 1
 		self.incoming_capacity += 1
 		# Send the response back to the client
-		response_content = "Response to the message: {message.message_content}"
-		response = Message(origin_address = self.ip_address, destination_address = message.origin_address, message_content = response_content)
+		self.create_response_message(message)
+	
+	def create_response_message(self, client_message):
+		response_content = f"Response to the message: {client_message.message_content}"
+		response = Message(origin_address = self.ip_address, destination_address = client_message.get_origin_address(), message_content = response_content)
 		self.send_response(response)
 
 	def send_response(self, message):
@@ -101,18 +115,6 @@ class Server(Machine, ABC):
 class ApplicationServer(Server):
 	def __init__(self, ip_address, port, outgoing_capacity, incoming_capacity):
 		super().__init__(ip_address, port, outgoing_capacity, incoming_capacity)
-
-class Message():
-	def __init__(self, origin_address, destination_address, message_content ) -> None:
-		self.origin_address = origin_address
-		self.destination_address = destination_address
-		self.message_content = message_content
-	
-	def get_origin_address(self):
-		return self.origin_address
-	
-	def get_destination_address(self):
-		return self.destination_address
 
 class Client(Machine):
 	all_clients = {}
