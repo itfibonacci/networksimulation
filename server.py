@@ -20,7 +20,7 @@ class Server(Machine, ABC):
 		self.incoming_requests += 1
 		self.incoming_capacity -= 1
 		# Simulate processing the request
-		time.sleep(0.1)
+		#time.sleep(0.1)
 		logging.info(f"[{self.ip_address}]:Received request: {message.id} from client: {message.get_origin_address()}")
 		self.incoming_requests -= 1
 		self.incoming_capacity += 1
@@ -36,7 +36,7 @@ class Server(Machine, ABC):
 		# Send the response back to the client
 		self.outgoing_requests += 1
 		self.outgoing_capacity -= 1
-		time.sleep(0.1)
+		#time.sleep(0.1)
 		client = Machine.find_machine_by_ip(message.get_destination_address())
 		# todo
 		logging.info(f"[{self.ip_address}]:Sent response: {message.id} to client: {message.get_destination_address()}")

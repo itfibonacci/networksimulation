@@ -36,6 +36,7 @@ def main():
     ap2 = ApplicationServer("128.0.0.1", 65543, 1000, 10000)
     ap2.start()
 
+
     client1 = Client("124.0.0.1", 54432, 10, 10)
     client1.start()
     client2 = Client("125.0.0.1", 54432, 10, 10)

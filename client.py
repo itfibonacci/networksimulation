@@ -1,9 +1,12 @@
 import logging
 import time
+import threading
 
 from message import Message
 from machine import Machine
 from exceptions import IPAddressNotFoundException
+
+# We can add a stat to the client of how many messages were sent and how many received.
 
 class Client(Machine):
 	all_clients = {}
@@ -25,7 +28,7 @@ class Client(Machine):
 	def receive_response(self, message):
 		self.incoming_requests += 1
 		self.incoming_capacity -= 1
-		time.sleep(0.1)
+		#time.sleep(0.1)
 		logging.info(f"[{self.ip_address}]:Received response: {message.id} from server: {message.get_origin_address()}")
 		self.incoming_requests -= 1
 		self.incoming_capacity += 1
@@ -36,5 +39,9 @@ class Client(Machine):
 			time.sleep(0.1)
 		
 	def send_request_bulk(self, destination_address, message_content, amount_of_messages):
+		thread = threading.Thread(target=self._send_requests_bulk, args=(destination_address, message_content, amount_of_messages))
+		thread.start()
+	
+	def _send_requests_bulk(self, destination_address, message_content, amount_of_messages):
 		for _ in range(amount_of_messages):
 			self.send_request(destination_address, message_content)
