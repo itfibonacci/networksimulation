@@ -72,6 +72,7 @@ class Machine(ABC):
 		else:
 			return True
 
+	@abstractmethod
 	def start(self):
 		if self.status == "Stopped":
 			self.status = "Running"

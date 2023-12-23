@@ -28,21 +28,21 @@ def get_log_filename():
 	return filename
 
 def main():
-    # Your main program logic goes here
-    logging.basicConfig(filename=get_log_filename(), encoding='utf-8', format='%(asctime)s:%(levelname)s:%(message)s', level=logging.DEBUG)
+	# Your main program logic goes here
+	logging.basicConfig(filename=get_log_filename(), encoding='utf-8', format='%(asctime)s:%(levelname)s:%(message)s', level=logging.DEBUG)
 
-    ap1 = ApplicationServer("127.0.0.1", 65543, 100, 100)
-    ap1.start()
-    
-    client1 = Client("124.0.0.1", 54432, 10, 10)
-    client1.start()
-    client1.send_request("127.0.0.1", "Hello World")
-    #client1.stop()
-    
-    #ap1.stop()
-    
-    #client2.send_request_bulk("128.0.0.1", "Hello World", 1000)
-    #client3.send_request_bulk("127.0.0.1", "Hello World", 1000)
+	ap1 = ApplicationServer("127.0.0.1", 65543, 100, 100)
+	ap1.start()
+
+	client1 = Client("124.0.0.1", 54432, 10, 10)
+	client1.start()
+	client1.send_request("127.0.0.1", "Hello World")
+
+	client1.stop()
+	ap1.stop()
+
+	#client2.send_request_bulk("128.0.0.1", "Hello World", 1000)
+	#client3.send_request_bulk("127.0.0.1", "Hello World", 1000)
 
 if __name__ == "__main__":
-    main()
+	main()
