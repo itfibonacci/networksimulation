@@ -33,19 +33,16 @@ def main():
 
     ap1 = ApplicationServer("127.0.0.1", 65543, 100, 100)
     ap1.start()
-    ap2 = ApplicationServer("128.0.0.1", 65543, 1000, 10000)
-    ap2.start()
-
-
+    
     client1 = Client("124.0.0.1", 54432, 10, 10)
     client1.start()
-    client2 = Client("125.0.0.1", 54432, 10, 10)
-    client2.start()
-    client3 = Client("126.0.0.1", 54432, 10, 10)
-    client3.start()
-    client1.send_request_bulk("127.0.0.1", "Hello World", 1000)
-    client2.send_request_bulk("128.0.0.1", "Hello World", 1000)
-    client3.send_request_bulk("127.0.0.1", "Hello World", 1000)
+    client1.send_request("127.0.0.1", "Hello World")
+    #client1.stop()
+    
+    #ap1.stop()
+    
+    #client2.send_request_bulk("128.0.0.1", "Hello World", 1000)
+    #client3.send_request_bulk("127.0.0.1", "Hello World", 1000)
 
 if __name__ == "__main__":
     main()

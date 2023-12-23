@@ -5,6 +5,7 @@ import re
 import time
 import threading
 import sys
+import queue
 
 class Machine(ABC):
 
@@ -24,10 +25,12 @@ class Machine(ABC):
 
 		self.ip_address = ip_address
 		self.port = port
-		self.outgoing_capacity = outgoing_capacity
 		self.incoming_capacity = incoming_capacity
+		self.outgoing_capacity = outgoing_capacity
 		self.incoming_requests = 0
 		self.outgoing_requests = 0
+		self.incoming_queue = queue.Queue(self.incoming_capacity)
+		self.outgoing_queue = queue.Queue(self.outgoing_capacity)
 		self.status = "Stopped"
 	
 	@classmethod
@@ -73,6 +76,10 @@ class Machine(ABC):
 		if self.status == "Stopped":
 			self.status = "Running"
 			logging.info(f"[{self.ip_address}]:{self.__class__.__name__} started")
-			self.start_printing_load()
+			#self.start_printing_load()
 		elif self.status == "Running":
 			logging.warn(f"[{self.ip_address}]:{self.__class__.__name__} has been started already.")
+	
+	@abstractmethod
+	def stop(self):
+		pass
