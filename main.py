@@ -7,6 +7,7 @@ from server import ApplicationServer
 from client import Client
 # implement deleting a machine and removing the ip address from the pool
 # invalid ip address based on a regex pattern
+# dns servers
 
 # Logging setup to log to a file
 def get_log_filename():
