@@ -5,6 +5,7 @@ from datetime import datetime
 
 from server import ApplicationServer
 from client import Client
+from dns import DNS
 # implement deleting a machine and removing the ip address from the pool
 # invalid ip address based on a regex pattern
 # dns servers
@@ -35,10 +36,14 @@ def main():
 	ap1 = ApplicationServer("127.0.0.1", 65543, 100, 100)
 	ap1.start()
 
+	dns1 = DNS("10.0.0.1", 54, 10, 10)
+	dns1.start()
+
 	client1 = Client("124.0.0.1", 54432, 10, 10)
 	client1.start()
 	client1.send_request("127.0.0.1", "Hello World")
 
+	dns1.stop()
 	client1.stop()
 	ap1.stop()
 

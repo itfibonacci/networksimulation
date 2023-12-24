@@ -44,7 +44,7 @@ class Machine(ABC):
 			return True
 		else:
 			raise False
-	
+
 	@classmethod
 	def find_machine_by_ip(cls, ip_address):
 		if ip_address in Machine.all_machines:
@@ -111,15 +111,6 @@ class Machine(ABC):
 		self.outgoing_queue.put(outgoing_message)
 		logging.info(f"[{self.ip_address}]:Queued outgoing message: {outgoing_message.id} to machine: {outgoing_message.get_destination_address()}")
 		logging.info(f"{self.outgoing_queue.get()}")
-
-	# def receive_message(self, incoming_message):
-	# 	self.incoming_requests += 1
-	# 	self.incoming_capacity -= 1
-	# 	#time.sleep(0.1)
-	# 	logging.info(f"[{self.ip_address}]:Queued incoming message: {incoming_message.id} from machine: {incoming_message.get_origin_address()}")
-	# 	self.incoming_queue.put(incoming_message)
-	# 	self.incoming_requests -= 1
-	# 	self.incoming_capacity += 1
 
 	def start(self):
 		if self.status == "Stopped":
