@@ -9,6 +9,7 @@ from dns import DNS
 # implement deleting a machine and removing the ip address from the pool
 # invalid ip address based on a regex pattern
 # dns servers
+# make ip address a class/type
 
 # Logging setup to log to a file
 def get_log_filename():
@@ -36,7 +37,8 @@ def main():
 	ap1 = ApplicationServer("127.0.0.1", 65543, 100, 100)
 	ap1.start()
 
-	dns1 = DNS("10.0.0.1", 54, 10, 10)
+	dns1 = DNS("8.8.8.8", 54, 10, 10)
+	dns1.add_record("www.amazon.com", "127.0.0.1")
 	dns1.start()
 
 	client1 = Client("124.0.0.1", 54432, 10, 10)

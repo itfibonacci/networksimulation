@@ -12,3 +12,8 @@ class Message():
 	
 	def get_destination_address(self):
 		return self.destination_address
+
+class dnsMessage(Message):
+	def __init__(self, origin_address, dns_server, message_content, request_type) -> None:
+		super().__init__(origin_address, dns_server, message_content, request_type)
+		self.request_type = request_type

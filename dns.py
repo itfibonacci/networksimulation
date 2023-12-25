@@ -11,6 +11,9 @@ UpdateRecord: This method would update an existing DNS record in the server’s 
 LookupRecord: This method would search for a DNS record in the server’s database.
 ReloadZoneFiles: This method would reload the zone files from disk into memory."""
 
+import logging
+from queue import Empty
+
 from server import Server
 
 class DNS(Server):
@@ -26,3 +29,13 @@ class DNS(Server):
 
 	def add_record(self, fqdn, ip_address):
 		DNS.dns_records[fqdn] = list(ip_address)
+
+	def process_incoming_queue(self):
+		while self.status == "Running":
+			try:
+				dns_message = self.incoming_queue.get(timeout=1)
+				logging.info(f"[{self.ip_address}]:Processing dns message from incoming queue: {dns_message.id}")
+				dns_response = self.resolve(dns_message.message_content)
+				self.queue_outgoing_message(dns_response)
+			except Empty:
+				continue

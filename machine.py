@@ -32,8 +32,6 @@ class Machine(ABC):
 		self.port = port
 		self.incoming_capacity = incoming_capacity
 		self.outgoing_capacity = outgoing_capacity
-		self.incoming_requests = 0
-		self.outgoing_requests = 0
 		self.incoming_queue = queue.Queue(self.incoming_capacity)
 		self.outgoing_queue = queue.Queue(self.outgoing_capacity)
 		self.status = "Stopped"
@@ -76,7 +74,27 @@ class Machine(ABC):
 			return False
 		else:
 			return True
+		
+	def queue_incoming_message(self, incoming_message):
+		#time.sleep(0.1)
+		logging.info(f"[{self.ip_address}]:Queued incoming message: {incoming_message.id} from server: {incoming_message.get_origin_address()}")
+		self.incoming_queue.put(incoming_message)
+
+	def queue_outgoing_message(self, outgoing_message):
+		self.queue_outgoing_message_thread = threading.Thread(target=self._queue_outgoing_message,args=(outgoing_message, ))
+		self.queue_outgoing_message_thread.daemon = True
+		self.queue_outgoing_message_thread.start()
+		logging.info(f"[{self.ip_address}]:Started thread: {self.queue_outgoing_message_thread.getName()}")
+
+	def _queue_outgoing_message(self, outgoing_message):
+		self.outgoing_queue.put(outgoing_message)
+		logging.info(f"[{self.ip_address}]:Queued outgoing message: {outgoing_message.id} to machine: {outgoing_message.get_destination_address()}")
+		logging.info(f"{self.outgoing_queue.get()}")
 	
+	@abstractmethod
+	def process_incoming_queue(self):
+		pass
+
 	def process_outgoing_queue(self):
 		while self.status == "Running":
 			try:
@@ -86,31 +104,6 @@ class Machine(ABC):
 				machine_to_send.queue_incoming_message(outgoing_message)
 			except Empty:
 				continue
-	
-	def queue_incoming_message(self, incoming_message):
-		self.incoming_requests += 1
-		self.incoming_capacity -= 1
-		#time.sleep(0.1)
-		logging.info(f"[{self.ip_address}]:Queued incoming message: {incoming_message.id} from server: {incoming_message.get_origin_address()}")
-		self.incoming_queue.put(incoming_message)
-		self.incoming_requests -= 1
-		self.incoming_capacity += 1
-	
-	def queue_outgoing_message(self, outgoing_message):
-		self.queue_outgoing_message_thread = threading.Thread(target=self._queue_outgoing_message,args=(outgoing_message, ))
-		self.queue_outgoing_message_thread.daemon = True
-		self.queue_outgoing_message_thread.start()
-		logging.info(f"[{self.ip_address}]:Started thread: {self.queue_outgoing_message_thread.getName()}")
-
-	def _queue_outgoing_message(self, outgoing_message):
-		self.outgoing_requests += 1
-		self.outgoing_capacity -= 1
-		#message = Message(origin_address = self.ip_address, destination_address = outgoing_message.get_destination_address(), message_content = outgoing_message.message_content)
-		self.outgoing_requests -= 1
-		self.outgoing_capacity += 1
-		self.outgoing_queue.put(outgoing_message)
-		logging.info(f"[{self.ip_address}]:Queued outgoing message: {outgoing_message.id} to machine: {outgoing_message.get_destination_address()}")
-		logging.info(f"{self.outgoing_queue.get()}")
 
 	def start(self):
 		if self.status == "Stopped":

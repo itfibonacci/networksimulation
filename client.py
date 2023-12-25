@@ -3,7 +3,7 @@ import time
 import threading
 from queue import Empty
 
-from message import Message
+from message import Message, dnsMessage
 from machine import Machine
 from exceptions import IPAddressNotFoundException
 
@@ -25,6 +25,8 @@ class Client(Machine):
 				continue
 
 	def send_request(self, destination_address, message_content):
+		dns_request = dnsMessage(self.ip_address, '8.8.8.8', 'www.amazon.com', "resolve")
+		self.queue_outgoing_message(dns_request)
 		request = Message(self.ip_address, destination_address, message_content)
 		self.queue_outgoing_message(request)
 
